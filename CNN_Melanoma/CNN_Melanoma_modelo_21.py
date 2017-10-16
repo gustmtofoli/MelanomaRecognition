@@ -209,8 +209,8 @@ def print_progress(epoch, feed_dict_train, feed_dict_test, test_loss, feed_dict_
     test_acc = sess.run(accuracy, feed_dict=feed_dict_test)
     val_acc = sess.run(accuracy, feed_dict=feed_dict_val)
 
-    msg = "Epoch {0} --- Training Accuracy:{1:>6.1%},Testing Accuracy:{2:>6.1%}, Test Loss:{3:.3f}, Validation Accuracy:{4:>6.1%}"
-    print(msg.format(epoch + 1, acc, test_acc, test_loss, val_acc))
+    msg = "Epoch {0} --- Training Accuracy:{1:>6.1%},Testing Accuracy:{2:>6.1%}, Test Loss:{3:.3f}"
+    print(msg.format(epoch + 1, acc, test_acc, test_loss))
 
 
 total_iterations = 0
@@ -264,9 +264,9 @@ def optimize(num_iterations):
 
 
 
-        train_idx = np.random.randint(X_Val.shape[0], size=100)
-        batch_x_Val = X_Val[train_idx, :]
-        batch_y_Val = y_Val[train_idx]
+        # train_idx = np.random.randint(X_Val.shape[0], size=100)
+        # batch_x_Val = X_Val[train_idx, :]
+        # batch_y_Val = y_Val[train_idx]
         # info_output.write("batch_x_Validation:")
         # info_output.write("\n")
         # info_output.write(str(batch_x_Val))
@@ -287,15 +287,15 @@ def optimize(num_iterations):
         feed_dict_test = {x: batch_x_Test,
                           y_true: batch_y_Test, keep_prob: 1.0}
 
-        feed_dict_val = {x: batch_x_Val,
-                          y_true: batch_y_Val, keep_prob: 1.0}
+        # feed_dict_val = {x: batch_x_Val,
+        #                   y_true: batch_y_Val, keep_prob: 1.0}
 
         _, c, summary = sess.run([optimizer, cost, merged], feed_dict=feed_dict_train)
         if i % int(X_Train.shape[0] / batch_size) == 0:
             test_loss = sess.run(cost, feed_dict=feed_dict_test)
             epoch = int(i / (X_Train.shape[0] / batch_size))
             summary_writer.add_summary(summary, epoch * batch_size + i)
-            print_progress(epoch, feed_dict_train, feed_dict_test, test_loss, feed_dict_val)
+            print_progress(epoch, feed_dict_train, feed_dict_test, test_loss)
         total_iterations += num_iterations
         info_optimize.write("epoch: "+str(epoch))
         info_optimize.write("\n\n")
