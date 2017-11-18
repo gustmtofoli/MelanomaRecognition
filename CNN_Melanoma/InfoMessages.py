@@ -31,6 +31,9 @@ def infoTrainingAccuracy(step, accuracy):
 def infoTestAccuracy(accuracy):
     return print("test accuracy %g"%(accuracy))
 
+def infoBackgroundRemoved(n_images):
+    return print("> [OK] Background removed of ", n_images, " images")
+
 
 def errorMessage():
     return print("> [ERROR] Still not specified error")

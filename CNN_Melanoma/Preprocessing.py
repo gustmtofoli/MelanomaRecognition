@@ -1,6 +1,7 @@
 import cv2
 import os
 from PIL import Image
+import InfoMessages as info
 
 
 def load_images(folder):
@@ -11,12 +12,21 @@ def load_images(folder):
         return image_list
 
 
-def RemoveBackground(Image):
+def removeBackground(Image):
     IGray = cv2.cvtColor(Image,cv2.COLOR_BGR2GRAY)
     ret,BW = cv2.threshold(IGray,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     ret2,thresh2 = cv2.threshold(BW,127,255,cv2.THRESH_BINARY_INV)
     maskedImage = cv2.bitwise_and(Image,Image,mask=thresh2)
     return maskedImage
+
+
+def removeBackgrounds(images):
+    imgs = []
+    for image in images:
+        img = removeBackground(image)
+        imgs.append(img)
+    info.infoBackgroundRemoved(len(imgs))
+    return imgs
 
 
 def Resize_Images(path,path2):

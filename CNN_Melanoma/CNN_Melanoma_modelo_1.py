@@ -99,22 +99,20 @@ print("> [OK] Images are normalized")
 
 print("> [STARTED] Convolution Neural Network")
 
+
 tf.reset_default_graph()
 x = tf.placeholder(tf.float32, [None, 4096*3],name="x-in")
 true_y = tf.placeholder(tf.float32, [None, 2],name="y-in")
 keep_prob = tf.placeholder("float")
 
 x_image = tf.reshape(x,[-1,64,64,3])
-hidden_1 = slim.conv2d(x_image, 32,[2,2])
+hidden_1 = slim.conv2d(x_image,16,[3,3])
 pool_1 = slim.max_pool2d(hidden_1,[2,2])
-hidden_2 = slim.conv2d(pool_1,8,[2,2])
+hidden_2 = slim.conv2d(pool_1,16,[3,3])
 pool_2 = slim.max_pool2d(hidden_2,[2,2])
-hidden_3_1 = slim.conv2d(pool_2, 32, [2,2])
-pool_3 = slim.max_pool2d(hidden_3_1, [2, 2])
-hidden_3_2 = slim.conv2d(pool_3, 64, [2,2])
-hidden_3 = slim.dropout(hidden_3_2, keep_prob)
+hidden_3_1 = slim.conv2d(pool_2,64,[3,3])
+hidden_3 = slim.dropout(hidden_3_1,keep_prob)
 out_y = slim.fully_connected(slim.flatten(hidden_3),2,activation_fn=tf.nn.softmax)
-
 
 cross_entropy = -tf.reduce_sum(true_y*tf.log(out_y))
 correct_prediction = tf.equal(tf.argmax(out_y,1), tf.argmax(true_y,1))
@@ -127,15 +125,81 @@ init = tf.global_variables_initializer()
 sess.run(init)
 for i in range(1001):
     train_idx=np.random.randint(X_Train.shape[0],size=100)
-    batch_x_Train = X_Train[train_idx,:]
-    batch_y_Train = y_Train[train_idx]
+    batch_x_Train=X_Train[train_idx,:]
+    batch_y_Train=y_Train[train_idx]
     sess.run(train_step, feed_dict={x:batch_x_Train,true_y:batch_y_Train, keep_prob:0.5})
     if i % 100 == 0 and i != 0:
         trainAccuracy = sess.run(accuracy, feed_dict={x:batch_x_Train,true_y:batch_y_Train, keep_prob:1.0})
-        Info.infoTrainingAccuracy(i, trainAccuracy)
+        print("step %d, training accuracy %g"%(i, trainAccuracy))
 
-train_idx = np.random.randint(X_Test.shape[0],size=100)
-batch_x_Test = X_Test[train_idx,:]
+train_idx = np.random.randint(X_Test.shape[0], size=100)
+batch_x_Test = X_Test[train_idx, :]
 batch_y_Test = y_Test[train_idx]
-testAccuracy = sess.run(accuracy, feed_dict={x:batch_x_Test,true_y:batch_y_Test, keep_prob:1.0})
-Info.infoTestAccuracy(testAccuracy)
+testAccuracy = sess.run(accuracy, feed_dict={x: batch_x_Test, true_y: batch_y_Test, keep_prob: 1.0})
+print("test accuracy %g" % (testAccuracy))
+
+
+def getActivations(layer,stimuli):
+    units = sess.run(layer,feed_dict={x:np.reshape(stimuli,[1,4096*3],order='F'),keep_prob:1.0})
+    plotNNFilter(units)
+
+def plotNNFilter(units):
+    filters = units.shape[3]
+    plt.figure(1, figsize=(64,64))
+    n_columns = 6
+    n_rows = math.ceil(filters / n_columns) + 1
+    plt.axis('off')
+    for i in range(filters):
+        plt.subplot(n_rows, n_columns, i+1)
+        plt.title('Filter ' + str(i))
+        plt.imshow(units[0,:,:,i], interpolation="nearest",cmap="gray")
+
+X_Train = load_images(path_Train)
+X_Train = np.array(X_Train)
+imageToUse = X_Train[0]
+plt.imshow(imageToUse)
+
+X_Train1=np.reshape(X_Train,[-1,np.prod(X_Train.shape[1:])])
+X_Train1.shape
+imageToUse=X_Train1[0]
+
+getActivations(hidden_1,imageToUse)
+
+getActivations(pool_1,imageToUse)
+
+getActivations(hidden_2,imageToUse)
+
+getActivations(pool_2,imageToUse)
+
+getActivations(hidden_3_1,imageToUse)
+
+# def plotNNFilter(units):
+#     filters = units.shape[3]
+#     plt.figure(1, figsize=(20,20))
+#     n_columns = 6
+#     n_rows = math.ceil(filters / n_columns) + 1
+#     for i in range(filters):
+#         plt.subplot(n_rows, n_columns, i+1)
+#         plt.title('Filter ' + str(i))
+#         plt.imshow(units[0,:,:,i], interpolation="nearest",cmap="gray")
+#
+# def getActivations(layer,stimuli):
+#     units = sess.run(layer,feed_dict={x:np.reshape(stimuli,[1,4096*3],order='F'),keep_prob:1.0})
+#     plotNNFilter(units)
+#
+# X_Train=load_images(path_Train)
+# X_Train=np.array(X_Train)
+# imageToUse = X_Train[491]
+# plt.imshow(imageToUse)
+#
+# X_Train1=np.reshape(X_Train,[-1,np.prod(X_Train.shape[1:])])
+# X_Train1.shape
+# imageToUse=X_Train1[491]
+#
+# getActivations(hidden_1,imageToUse)
+#
+# getActivations(hidden_2,imageToUse)
+#
+# getActivations(hidden_3,imageToUse)
+
+
