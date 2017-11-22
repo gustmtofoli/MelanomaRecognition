@@ -100,6 +100,7 @@ def variable_summaries(var):
 
 def conv_layer(input,input_channels,filter_size,num_filters,layer_name,use_pooling=True):
     with tf.name_scope(layer_name):
+        print("inside conv_layer")
         shape=[filter_size,filter_size,input_channels,num_filters]
         with tf.name_scope('Weights'):
             weights=weights_initilization(shape)
@@ -108,20 +109,21 @@ def conv_layer(input,input_channels,filter_size,num_filters,layer_name,use_pooli
             biases=biases_initilization(length=num_filters)
             variable_summaries(biases)
         conv_layer=tf.nn.conv2d(input=input,filter=weights,strides=[1,1,1,1],padding='SAME')
-        print("layer conv: ", conv_layer.shape)
+        print("\tlayer conv: ", conv_layer.shape)
         conv_layer+=biases
 
         if use_pooling:
             pooling_layer=tf.nn.max_pool(value=conv_layer,ksize=[1,2,2,1],
                                          strides=[1,2,2,1],padding='SAME')
-            print("layer after pooling: ", pooling_layer.shape)
+            print("\tlayer after pooling: ", pooling_layer.shape)
 
             Activation_layer=tf.nn.relu(pooling_layer)
-            print("layer after relu: ", Activation_layer.shape)
+            print("\tlayer after relu: ", Activation_layer.shape)
 
     return Activation_layer,weights
 
 def fc_layer(input,num_inputs,num_outputs,layer_name,keep_prob,use_relu=True):
+    print("inside fc_layer")
     with tf.name_scope(layer_name):
         with tf.name_scope("Weights_FC"):
             weights=weights_initilization(shape=[num_inputs,num_outputs])
@@ -131,22 +133,28 @@ def fc_layer(input,num_inputs,num_outputs,layer_name,keep_prob,use_relu=True):
             variable_summaries(biases)
         with tf.name_scope("Wx_plus_b"):
             layer=tf.matmul(input,weights)+biases
+            print("\tlayer after matmul: ", layer.shape)
             tf.summary.histogram('Preactivation',layer)
         with tf.name_scope('Activation'):
             if use_relu:
                 layer=tf.nn.relu(layer)
+                print("\tlayer after relu: ", layer.shape)
                 tf.summary.histogram('activation',layer)
         with tf.name_scope('dropout'):
             layer=tf.nn.dropout(layer,keep_prob)
-        print("layer fc: ", layer.shape)
+            print("\tkeeo_prob: ", keep_prob)
+            print("\tlayer fc: ", layer.shape)
     return layer,weights
 
 def flatten_layer(layer,layer_name):
+    print("inside faltten_layer")
     with tf.name_scope(layer_name):
         layer_shape=layer.get_shape()
+        print("\tlayer: ", layer_shape)
         num_features=layer_shape[1:4].num_elements()
+        print("\tnum_features: ", num_features)
         layer_flat=tf.reshape(layer,[-1,num_features])
-    print("layer flat: ", layer_flat.shape)
+        print("\tlayer flat: ", layer_flat.shape)
     return layer_flat,num_features
 
 layer_conv1,weights_conv1=conv_layer(input=x,input_channels=num_channels,filter_size=filter_size1,
@@ -183,7 +191,7 @@ tf.summary.scalar('cost',cost)
 
 
 with tf.name_scope('train'):
-    optimizer=tf.train.AdamOptimizer(learning_rate=0.00001).minimize(cross_entropy)
+    optimizer=tf.train.AdamOptimizer(learning_rate=0.0001).minimize(cross_entropy)
 with tf.name_scope("Accuracy"):
     with tf.name_scope('correct_prediction'):
         correct_prediction=tf.equal(y_pred_cls,y_true_cls)

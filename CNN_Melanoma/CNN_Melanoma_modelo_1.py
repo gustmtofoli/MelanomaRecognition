@@ -74,7 +74,7 @@ path_ground_truth_test = "/home/gustavo/Documentos/DATA_BASE/ISIC-2017_Test_v2_P
 data_Test = pd.read_csv(path_ground_truth_test)
 Info.infoGroundTruth(path_ground_truth_test, "TEST")
 data_Train = data_Train.iloc[0:2000,1]
-print(data_Train)
+# print(data_Train)
 
 data_Test = data_Test.iloc[0:600,1]
 x_Train = data_Train
@@ -107,12 +107,20 @@ keep_prob = tf.placeholder("float")
 
 x_image = tf.reshape(x,[-1,64,64,3])
 hidden_1 = slim.conv2d(x_image,16,[3,3])
+print("conv1: ", hidden_1.shape)
 pool_1 = slim.max_pool2d(hidden_1,[2,2])
+print("pool1: ", pool_1.shape)
 hidden_2 = slim.conv2d(pool_1,16,[3,3])
+print("conv2: ", hidden_2.shape)
 pool_2 = slim.max_pool2d(hidden_2,[2,2])
-hidden_3_1 = slim.conv2d(pool_2,64,[3,3])
+print("pool2: ", pool_2.shape)
+hidden_3_1 = slim.conv2d(pool_2,16,[3,3])
+print("conv3: ", hidden_3_1.shape)
 hidden_3 = slim.dropout(hidden_3_1,keep_prob)
+print("dropout: ", hidden_3.shape)
+
 out_y = slim.fully_connected(slim.flatten(hidden_3),2,activation_fn=tf.nn.softmax)
+print("layer fc: ", out_y.shape)
 
 cross_entropy = -tf.reduce_sum(true_y*tf.log(out_y))
 correct_prediction = tf.equal(tf.argmax(out_y,1), tf.argmax(true_y,1))
