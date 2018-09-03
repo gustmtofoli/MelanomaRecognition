@@ -18,4 +18,4 @@ install-dependencies:
 	sudo pip3 install opencv-python
 	sudo apt-get python3-dev
 
-# sciekit-learn
+# scikit-learn
