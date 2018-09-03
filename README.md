@@ -1,2 +1,2 @@
 # MelanomaRecognition
-Deep Learning for melanoma regognition
+Deep Learning for melanoma recognition
