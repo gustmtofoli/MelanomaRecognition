@@ -19,3 +19,7 @@ install-dependencies:
 	sudo apt-get python3-dev
 
 # scikit-learn
+# matplotlib
+# cv2
+# pandas
+# keras

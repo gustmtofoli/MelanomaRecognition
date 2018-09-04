@@ -137,28 +137,20 @@ def fc_layer(input,num_inputs,num_outputs,layer_name,keep_prob,use_relu=True):
             variable_summaries(biases)
         with tf.name_scope("Wx_plus_b"):
             layer=tf.matmul(input,weights)+biases
-            print("\tlayer after matmul: ", layer.shape)
             tf.summary.histogram('Preactivation',layer)
         with tf.name_scope('Activation'):
             if use_relu:
                 layer=tf.nn.relu(layer)
-                print("\tlayer after relu: ", layer.shape)
                 tf.summary.histogram('activation',layer)
         with tf.name_scope('dropout'):
             layer=tf.nn.dropout(layer,keep_prob)
-            print("\tkeeo_prob: ", keep_prob)
-            print("\tlayer fc: ", layer.shape)
     return layer,weights
 
 def flatten_layer(layer,layer_name):
-    print("inside faltten_layer")
     with tf.name_scope(layer_name):
         layer_shape=layer.get_shape()
-        print("\tlayer: ", layer_shape)
         num_features=layer_shape[1:4].num_elements()
-        print("\tnum_features: ", num_features)
         layer_flat=tf.reshape(layer,[-1,num_features])
-        print("\tlayer flat: ", layer_flat.shape)
     return layer_flat,num_features
 
 layer_conv1,weights_conv1=conv_layer(input=x,input_channels=num_channels,filter_size=filter_size1,

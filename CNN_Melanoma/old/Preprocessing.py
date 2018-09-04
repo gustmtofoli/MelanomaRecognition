@@ -1,7 +1,6 @@
 import cv2
 import os
 from PIL import Image
-import InfoMessages as info
 
 
 def load_images(folder):
@@ -25,7 +24,6 @@ def removeBackgrounds(images):
     for image in images:
         img = removeBackground(image)
         imgs.append(img)
-    info.infoBackgroundRemoved(len(imgs))
     return imgs
 
 
